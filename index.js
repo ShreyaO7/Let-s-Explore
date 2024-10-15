@@ -3,6 +3,8 @@ const app= express();
 const path=require("path");
 const port=3000;
 const Listing= require("./models/listing.js")
+const methodOverride=require("method-override");
+const ejsMate=require("ejs-mate");
 
 
 
@@ -18,11 +20,57 @@ async function main() {
 }
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname,"views"));
+app.use(express.urlencoded({extended:true})); //data getting parsed
 
+//index route
 app.get("/listings",async(req,res)=>{
-  const allListings=await Listing.find({});
-  res.render("/listings/index.ejs",{allListings});
-})
+  const allListings= await Listing.find({});
+  res.render('/listings/index.ejs',{allListings});
+});
+
+//New route
+app.get("/listings/new",(req,res)=>{
+  res.render("listings/new.ejs");
+
+});
+
+//show route
+app.get("/listings/:id", async(req,res)=>{
+  let{id}=req.params;
+  const listing=await Listing.findById(id);
+  res.render("listings/show.ejs",{listing});
+});
+
+
+//Create Route
+app.post("/listings", async (req, res) => {
+  const newListing = new Listing(req.body.listing);
+  await newListing.save();
+  res.redirect("/listings");
+});
+
+//Edit Route
+app.get("/listings/:id/edit", async (req, res) => {
+  let { id } = req.params;
+  const listing = await Listing.findById(id);
+  res.render("listings/edit.ejs", { listing });
+});
+
+//Update Route
+app.put("/listings/:id", async (req, res) => {
+  let { id } = req.params;
+  await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+  res.redirect(`/listings/${id}`);
+});
+
+//Delete Route
+app.delete("/listings/:id", async (req, res) => {
+  let { id } = req.params;
+  let deletedListing = await Listing.findByIdAndDelete(id);
+  console.log(deletedListing);
+  res.redirect("/listings");
+});
+
 
 app.get('/about', (req, res) => {
     res.send('About Page');
