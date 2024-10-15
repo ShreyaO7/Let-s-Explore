@@ -1,5 +1,5 @@
 //store sample data
-const sampleListings = [ //array
+const sampleListings = [ 
     {
       title: "Cozy Beachfront Cottage",
       description:
