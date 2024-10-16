@@ -7,10 +7,11 @@ const listingSchema= new schema({
         required:true,
     },
     image:{
-        type:{
-            filename:String,
-            url:String
-        },
+        // type:{
+        //     filename:String,
+        //     url:String
+        // },
+        type:String,
         required:true,
     },
     description:String,
