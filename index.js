@@ -23,6 +23,7 @@ app.set("views", path.join(__dirname,"views"));
 app.set("view engine", "ejs");
 app.use(methodOverride('_method'));
 app.engine('ejs', ejsMate);
+app.use(express.static(path.join(__dirname,"/public")))
 
 app.use(express.urlencoded({extended:true})); //data getting parsed
 
