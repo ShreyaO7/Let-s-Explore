@@ -111,8 +111,8 @@ app.put("/listing/:id", async (req, res) => {
 });
 
 
-app.get('/about', (req, res) => {
-    res.send('About Page');
+app.get('/', (req, res) => {
+    res.send('home page!');
   });
 
   // app.get("/testListing", async(req,res)=>{
