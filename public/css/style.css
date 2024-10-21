@@ -1,4 +1,13 @@
-/* Navbar */
+body{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.container{
+    flex: 1;
+}
+
+    /* Navbar */
 .navbar{
     height:5em ;
     background-color:whitesmoke ;
@@ -42,3 +51,53 @@
     justify-content: center;
     align-items: space-evenly;
 }
+/* cards */
+.card{
+    border: none !important;
+    margin-bottom: 2rem;
+
+}
+.card-img-top{
+   border-radius: 1rem !important; 
+   width: 100% !important;
+   object-fit: cover !important;
+}
+.card-body{
+    padding: 0 !important;
+}
+.card-text-p{
+    font-weight: 400;
+}
+.card-title{
+    font-family:cursive;
+}
+.listing-link{
+    text-decoration: none !important;
+}
+.card-body{
+    color: black !important;
+}
+/* card effect */
+.card-img-overlay{
+    opacity: 0;
+}
+.card-img-overlay:hover{
+    opacity: 0.3;
+    background-color: white;
+}
+/* new template */
+.add-btn{
+    background-color: rgb(255, 60, 0) !important;
+    
+}
+.input-field{
+    border-radius: 2% !important;
+    border-color: black !important;
+}
+/* show template */
+.show-img{
+    height: 30vh;
+    
+
+}
+

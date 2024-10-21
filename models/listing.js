@@ -6,18 +6,15 @@ const listingSchema= new schema({
         type:String,
         required:true,
     },
-    image:{
-        // type:{
-        //     filename:String,
-        //     url:String
-        // },
-        type:String,
-        required:true,
-    },
+    image: {
+        filename: { type: String },
+        url: { type: String, required: true }
+      },
     description:String,
     price:Number,
     location:String,
     country:String,
+   
 });
  const Listing=mongoose.model("Listing",listingSchema);
  module.exports= Listing;

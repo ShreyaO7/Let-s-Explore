@@ -4,7 +4,6 @@ const path=require("path");
 const port=3000;
 const Listing= require("./models/listing.js")
 const methodOverride = require("method-override");
-
 const ejsMate=require("ejs-mate");
 
 
@@ -12,7 +11,10 @@ const ejsMate=require("ejs-mate");
 // getting-started with mongoose
 const mongoose = require('mongoose');
 
-main().catch(err => console.log(err));
+main().then(()=>{
+  console.log("DB is connected")
+})
+.catch(err => console.log(err));
 
 async function main() {
   await mongoose.connect('mongodb://127.0.0.1:27017/explorer');
@@ -64,13 +66,18 @@ app.get("/listing/:id", async (req, res) => {
 
 
 //Create Route
-app.post("/listing", async (req, res) => {
-  console.log(req.body.listing)
-  const newListing = new Listing(req.body.listing);
-  await newListing.save();
-  res.redirect("/listings");
+app.post("/listing", async (req, res, next) => {
+  try{
+    console.log(req.body.listing)
+    const newListing = new Listing(req.body.listing);
+    await newListing.save();
+    res.redirect("/listing");
+  }
+  catch(err){
+    next(err);
+  }
 });
-//
+
 
 //Edit Route
 app.get("/listing/:id/edit", async (req, res) => {
@@ -100,8 +107,13 @@ app.delete("/listing/:id", async (req, res) => {
     res.status(500).send("Server Error"); // Handle any server errors.
   }
 });
+app.get("/root",async(req,res)=>{
+  res.send("hi welcome to my website!");
+});
 
-
+app.use((err, req,res,next)=>{       // async error handler
+  res.send("something went wrong!!");
+});
 
 // Update Route
 app.put("/listing/:id", async (req, res) => {
@@ -109,26 +121,10 @@ app.put("/listing/:id", async (req, res) => {
   let listing1=await Listing.findByIdAndUpdate(id, { ...req.body.listing });
   res.redirect(`/listing`);
 });
+app.get("/",(req,res)=>{
+  res.send("home page")
+})
 
-
-app.get('/', (req, res) => {
-    res.send('home page!');
-  });
-
-  // app.get("/testListing", async(req,res)=>{
-  //   let sampleListing=new Listing({
-  //     title:"MY villa",
-  //     description:"BY the beach",
-  //     price:5000,
-  //     location:"goa",
-  //   });
-  //   await sampleListing.save();
-  //   console.log("sample is saved");
-  //   res.send("successful testing")
-  // });
-
-  
-
-app.listen(3000, ()=>{
-    console.log("server is running on port 3000")
+app.listen('3000',()=>{
+  console.log("App is listening at 3000")
 })
