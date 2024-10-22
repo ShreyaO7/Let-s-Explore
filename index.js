@@ -7,6 +7,7 @@ const methodOverride = require("method-override");
 const ejsMate=require("ejs-mate");
 const ExpressError=require("./utils/ExpressError.js");
 const {listingSchema}=require("./schema.js");
+const wrapAsync =require("./utils/wrapAsync.js");
 
 
 // getting-started with mongoose
@@ -67,17 +68,13 @@ app.get("/listing/:id", async (req, res) => {
 
 
 //Create Route
-app.post("/listing", async (req, res, next) => {
-  try{
+app.post("/listing", wrapAsync(async(req, res, next) => {   // wrapAsync is handling errors as try-catch
     console.log(req.body.listing)
     const newListing = new Listing(req.body.listing);
     await newListing.save();
     res.redirect("/listing");
-  }
-  catch(err){
-    next(err);
-  }
-});
+  })
+);
 
 
 //Edit Route
