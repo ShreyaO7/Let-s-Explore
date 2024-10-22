@@ -5,9 +5,9 @@ const port=3000;
 const Listing= require("./models/listing.js")
 const methodOverride = require("method-override");
 const ejsMate=require("ejs-mate");
+const wrapAsync =require("./utils/wrapAsync.js");
 const ExpressError=require("./utils/ExpressError.js");
 const {listingSchema}=require("./schema.js");
-const wrapAsync =require("./utils/wrapAsync.js");
 
 
 // getting-started with mongoose
@@ -32,10 +32,10 @@ app.use(express.static(path.join(__dirname,"/public")))
 app.use(express.urlencoded({extended:true})); //data getting parsed
 
 //index route
-app.get("/listing",async(req,res)=>{
+app.get("/listing", wrapAsync(async(req,res)=>{
   const allListings= await Listing.find({});
   res.render('listings/index.ejs',{allListings});
-});
+}));
 
 //New route
 app.get("/listing/new",(req,res)=>{
@@ -44,7 +44,7 @@ app.get("/listing/new",(req,res)=>{
 });
 
 //show route
-app.get("/listing/:id", async (req, res) => {
+app.get("/listing/:id",  wrapAsync(async (req, res) => {
   try {
     let { id } = req.params;
     // Validate ID format
@@ -64,12 +64,14 @@ app.get("/listing/:id", async (req, res) => {
     console.error("Error in Show Route:", err);
     res.status(500).send("Server Error");
   }
-});
+}));
 
 
 //Create Route
 app.post("/listing", wrapAsync(async(req, res, next) => {   // wrapAsync is handling errors as try-catch
-    console.log(req.body.listing)
+  if(!req.body.Listing){
+    throw new ExpressError(400,"send valid data for listing");
+  }
     const newListing = new Listing(req.body.listing);
     await newListing.save();
     res.redirect("/listing");
@@ -78,14 +80,14 @@ app.post("/listing", wrapAsync(async(req, res, next) => {   // wrapAsync is hand
 
 
 //Edit Route
-app.get("/listing/:id/edit", async (req, res) => {
+app.get("/listing/:id/edit",  wrapAsync(async (req, res) => {
   let { id } = req.params;
   const listing = await Listing.findById(id);
   res.render("listings/edit.ejs", { listing });
-});
+}));
 
 //Delete Route
-app.delete("/listing/:id", async (req, res) => {
+app.delete("/listing/:id",  wrapAsync(async (req, res) => {
   try {
     let { id } = req.params;
      
@@ -104,24 +106,32 @@ app.delete("/listing/:id", async (req, res) => {
     console.error(err);
     res.status(500).send("Server Error"); // Handle any server errors.
   }
-});
+}));
 app.get("/root",async(req,res)=>{
   res.send("hi welcome to my website!");
 });
 
+app.all("*",(req,res,next)=>{
+  next(new ExpressError(404,"page not found"));
+});
+
 app.use((err, req,res,next)=>{     // async error handler
-  let{statusCode, message}=err;
-  res.status(statusCode).send(message);
+  let{statusCode=500, message="something went wrong"}=err;   //default value set 
+  res.render("error.ejs");
+  // res.status(statusCode).send(message);
 });
 
 
 
 // Update Route
-app.put("/listing/:id", async (req, res) => {
+app.put("/listing/:id", wrapAsync(async (req, res) => {
+  if(!req.body.Listing){
+    throw new ExpressError(400,"send valid data for listing");
+  }
   let { id } = req.params;
   let listing1=await Listing.findByIdAndUpdate(id, { ...req.body.listing });
   res.redirect(`/listing`);
-});
+}));
 app.get("/",(req,res)=>{
   res.send("home page")
 })
