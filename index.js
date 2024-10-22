@@ -5,7 +5,8 @@ const port=3000;
 const Listing= require("./models/listing.js")
 const methodOverride = require("method-override");
 const ejsMate=require("ejs-mate");
-
+const ExpressError=require("./utils/ExpressError.js");
+const {listingSchema}=require("./schema.js");
 
 
 // getting-started with mongoose
@@ -111,9 +112,12 @@ app.get("/root",async(req,res)=>{
   res.send("hi welcome to my website!");
 });
 
-app.use((err, req,res,next)=>{       // async error handler
-  res.send("something went wrong!!");
+app.use((err, req,res,next)=>{     // async error handler
+  let{statusCode, message}=err;
+  res.status(statusCode).send(message);
 });
+
+
 
 // Update Route
 app.put("/listing/:id", async (req, res) => {
