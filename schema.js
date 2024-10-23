@@ -1,3 +1,4 @@
+//joi (server-side validation)
 const Joi= require('joi');
 module.exports.listingSchema=Joi.object({
     listing:Joi.object({

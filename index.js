@@ -2,12 +2,13 @@ const express= require("express");
 const app= express();
 const path=require("path");
 const port=3000;
-const Listing= require("./models/listing.js")
+const Listing= require("./models/listing.js");
 const methodOverride = require("method-override");
 const ejsMate=require("ejs-mate");
 const wrapAsync =require("./utils/wrapAsync.js");
 const ExpressError=require("./utils/ExpressError.js");
 const {listingSchema}=require("./schema.js");
+const Review= require("./models/review.js");
 
 
 // getting-started with mongoose
@@ -69,8 +70,10 @@ app.get("/listing/:id",  wrapAsync(async (req, res) => {
 
 //Create Route
 app.post("/listing", wrapAsync(async(req, res, next) => {   // wrapAsync is handling errors as try-catch
-  if(!req.body.Listing){
-    throw new ExpressError(400,"send valid data for listing");
+  let result= listingSchema.validate(req.body);
+  console.log(result);
+  if(result.error){
+    throw new ExpressError(400, result.error);
   }
     const newListing = new Listing(req.body.listing);
     await newListing.save();
@@ -116,7 +119,7 @@ app.all("*",(req,res,next)=>{
 });
 
 app.use((err, req,res,next)=>{     // async error handler
-  let{statusCode=500, message="something went wrong"}=err;   //default value set 
+  let { statusCode=500, message="something went wrong" }= err;   //default value set 
   res.render("error.ejs");
   // res.status(statusCode).send(message);
 });
@@ -136,6 +139,20 @@ app.get("/",(req,res)=>{
   res.send("home page")
 })
 
+//reviews
+//Post route
+app.post("/listing/:id/reviews",async(req,res)=>{
+  let listing= await Listing.findById(req.params.id);
+  let newReview= new Review(req.body.review);   //new review is created
+  listing.reviews.push(newReview);   //hr listing me reviews array bhi hoga aur usme newReview add krengy
+  
+  await newReview.save();
+  await listing.save();
+
+  console.log("new review saved");
+  res.send("new Review saved");
+});
+
 app.listen('3000',()=>{
   console.log("App is listening at 3000")
-})
+});
